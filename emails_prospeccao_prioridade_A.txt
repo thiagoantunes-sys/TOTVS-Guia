@@ -1,82 +1,71 @@
 EMPRESA: Jundiá Transportadora Turística Ltda
 PARA: jundia@jundia.net
-ASSUNTO: checklist dos Torino novos
-OBSERVAÇÃO: Ligue antes para (11) 4718-3001 ou (15) 3388-3500 e peça o nome do responsável por manutenção ou frota para personalizar a saudação. Não fale da paralisação, da redução de linhas nem de "ganharam a concessão" (a homologação não foi encontrada).
+ASSUNTO: Checklist digital para a frota de ônibus
+OBSERVAÇÃO: Ligue antes para (11) 4718-3001 ou (15) 3388-3500 e peça o nome do responsável por manutenção ou frota para personalizar a saudação. Não mencione a paralisação, a redução de linhas nem a concessão (a homologação não foi encontrada).
 CORPO:
-Olá, pessoal da Jundiá,
+Prezados,
 
-Vi que vocês receberam em maio 29 ônibus Marcopolo novos, os primeiros Torino da operadora. Frota nova costuma trazer vistoria de recebimento e revisões de garantia, e fiquei curioso sobre como vocês fazem hoje o checklist de saída e retorno da garagem.
+Acompanhei a notícia de que a Jundiá recebeu em maio 29 novos ônibus Marcopolo, os primeiros Torino da operadora. A chegada de uma frota nova costuma exigir vistoria de recebimento e controle das revisões de garantia, e por isso gostaria de entender como é feito hoje o checklist de saída e retorno da garagem.
 
-Sou da MobiActio, aqui da região de São Roque e Mairinque. Implantamos o uMov.me, uma plataforma de aplicativos para equipes de campo. Com ele, o motorista ou o fiscal faz a inspeção no celular, com foto, GPS e assinatura, mesmo sem internet. Se um item reprova, já abre uma ordem de serviço para a manutenção, e no painel web dá para ver quais carros estão liberados em cada turno. Também integra com ERP, inclusive TOTVS.
+Sou da MobiActio, empresa que implanta o uMov.me, uma plataforma de aplicativos para equipes de campo. Com ela, o motorista ou o fiscal realiza a inspeção pelo celular, com foto, GPS e assinatura, inclusive sem conexão com a internet. Quando um item é reprovado, uma ordem de serviço é aberta automaticamente para a manutenção, e o painel web mostra quais veículos estão liberados em cada turno. A plataforma também se integra a sistemas de gestão (ERP), inclusive TOTVS.
 
-Posso passar na garagem para uns 20 minutos de conversa?
+Teria disponibilidade para uma conversa de 20 minutos, presencial ou on-line, nas próximas semanas?
 
-Abraço,
-Thiago
+Atenciosamente,
+Thiago Antunes
 =====
 EMPRESA: SuperFrio, unidade Mairinque (antiga CEFRI)
 PARA: faleconosco@superfrio.com.br
-ASSUNTO: vistoria de contêiner em Mairinque
-OBSERVAÇÃO: A decisão é corporativa e a SuperFrio já tem WMS e TI próprios. Procure no LinkedIn o gerente de operações ou qualidade da unidade MAQ e mande para ele também; se faleconosco@ não responder, tente cotacao@superfrio.com.br.
+ASSUNTO: Vistoria digital de contêineres na unidade Mairinque
+OBSERVAÇÃO: A decisão é corporativa e a SuperFrio já tem WMS e TI próprios. Procure no LinkedIn o gerente de operações ou qualidade da unidade MAQ e envie também para ele; se faleconosco@ não responder, tente cotacao@superfrio.com.br.
 CORPO:
-Olá, pessoal da SuperFrio,
+Prezados,
 
-Estou escrevendo por causa da unidade de Mairinque, a antiga CEFRI. Vi o anúncio do pátio de contêineres de 210 TEUs integrado ao armazém e ao transporte para o Porto de Santos, e queria entender como vocês registram hoje a vistoria dos contêineres reefer e o checklist de doca.
+Entro em contato a respeito da unidade de Mairinque, antiga CEFRI. Tomei conhecimento do pátio de contêineres de 210 TEUs integrado ao armazém e ao transporte para o Porto de Santos, e gostaria de entender como são registrados hoje a vistoria dos contêineres reefer e o checklist de doca.
 
-Sou da MobiActio, que atende a região de São Roque e Mairinque. Implantamos o uMov.me, uma plataforma de aplicativos para inspeções em campo. O conferente registra no celular temperatura, set-point, lacre e fotos de avaria, com GPS e assinatura do transportador, e tudo aparece num painel web. A ideia é complementar os sistemas que vocês já usam, não substituir.
+Sou da MobiActio, empresa que atende a região de São Roque e Mairinque e implanta o uMov.me, uma plataforma de aplicativos para inspeções em campo. Pelo celular, o conferente registra temperatura, set-point, lacre e fotos de avarias, com GPS e assinatura do transportador, e as informações ficam disponíveis em um painel web. A proposta é complementar os sistemas já utilizados pela empresa, sem substituí-los.
 
-Pode me indicar quem cuida de operações ou qualidade na unidade de Mairinque? Gostaria de mostrar em 20 minutos como funciona.
+Poderiam me indicar o responsável por operações ou qualidade da unidade de Mairinque? Gostaria de apresentar a solução em uma reunião de 20 minutos.
 
-Abraço,
-Thiago
+Atenciosamente,
+Thiago Antunes
 =====
 EMPRESA: KP Transportes
 PARA: logistica@kptransportes.com.br
-ASSUNTO: canhoto e temperatura nas entregas
-OBSERVAÇÃO: Ligue antes para (19) 3291-0388 ou (11) 94727-6394 e confirme se a empresa ainda opera, onde fica a base e se o e-mail funciona (o site é antigo e há homônimos). Não diga que a KP é de Mairinque.
+ASSUNTO: Comprovante de entrega e registro de temperatura digitais
+OBSERVAÇÃO: Ligue antes para (19) 3291-0388 ou (11) 94727-6394 e confirme se a empresa ainda opera, onde fica a base e se o e-mail funciona (o site é antigo e há empresas com o mesmo nome). Não diga que a KP é de Mairinque.
 CORPO:
-Olá, pessoal da KP,
+Prezados,
 
-Vi no site que vocês transportam congelados, refrigerados e secos, com frota própria e terceirizada, e acompanham a temperatura do baú em tempo real.
+Conheci pelo site o trabalho da KP Transportes com cargas congeladas, refrigeradas e secas, com frota própria e terceirizada e monitoramento da temperatura do baú em tempo real.
 
-Em transporte refrigerado é comum o canhoto ainda voltar em papel e o checklist do baú ser difícil de cobrar dos agregados. Sou da MobiActio e implantamos o uMov.me, uma plataforma de aplicativos para equipes de campo, montada do jeito de cada operação. Com ele, o motorista fotografa o canhoto, colhe a assinatura de quem recebeu e registra a temperatura na coleta e na entrega, com GPS e mesmo sem sinal. O comprovante aparece na hora no painel web e pode seguir para o ERP.
+No transporte refrigerado, é comum que o canhoto ainda retorne em papel e que o checklist do baú seja difícil de controlar junto aos agregados. Sou da MobiActio, empresa que implanta o uMov.me, uma plataforma de aplicativos para equipes de campo configurada de acordo com cada operação. Com ela, o motorista fotografa o canhoto, coleta a assinatura do recebedor e registra a temperatura na coleta e na entrega, com GPS e mesmo sem sinal. O comprovante fica disponível imediatamente no painel web e pode ser enviado ao ERP.
 
-Topa uma conversa de 20 minutos para eu mostrar como funciona?
+Teria disponibilidade para uma conversa de 20 minutos, para que eu possa apresentar a solução?
 
-Abraço,
-Thiago
+Atenciosamente,
+Thiago Antunes
 =====
 EMPRESA: Loginter Transportes Nacionais e Internacionais
 PARA: loginter.sr@gmail.com
-ASSUNTO: documentos da viagem no celular
-OBSERVAÇÃO: Encaixe baixo, enviar por último. Ligue antes para (11) 4712-6913 ou (11) 4712-6814 para confirmar se a empresa está ativa; se confirmar o sócio Marcelo Augusto Borges, troque a saudação por "Olá, Marcelo,".
+ASSUNTO: Registro digital das etapas de viagem internacional
+OBSERVAÇÃO: Encaixe baixo, enviar por último. Ligue antes para (11) 4712-6913 ou (11) 4712-6814 para confirmar se a empresa está ativa; se confirmar o sócio Marcelo Augusto Borges, troque a saudação por "Prezado Marcelo,".
 CORPO:
-Olá, pessoal da Loginter,
+Prezados,
 
-Vi que vocês, aqui de São Roque, trabalham com transporte de importação e exportação na América Latina, com foco no Mercosul.
+Sei que a Loginter, sediada em São Roque, atua no transporte de importação e exportação na América Latina, com foco no Mercosul.
 
-Imagino que boa parte do dia seja acompanhar carga rodando com parceiro e juntar documentos e fotos de cada etapa. Sou da MobiActio e implantamos o uMov.me, uma plataforma de aplicativos para equipes de campo. Com ele, o motorista terceiro registra coleta, fronteira e entrega pelo celular, com foto, GPS e assinatura, sem precisar ter sistema nenhum. A documentação de cada viagem fica organizada num painel web.
+Em operações desse tipo, boa parte da rotina envolve acompanhar cargas transportadas por parceiros e reunir documentos e fotos de cada etapa. Sou da MobiActio, empresa que implanta o uMov.me, uma plataforma de aplicativos para equipes de campo. Com ela, o motorista terceirizado registra coleta, passagem pela fronteira e entrega pelo celular, com foto, GPS e assinatura, sem necessidade de sistema próprio. A documentação de cada viagem fica organizada em um painel web.
 
-Como somos vizinhos, vale um café de 20 minutos?
+Estamos na mesma região e teria satisfação em apresentar a solução em uma reunião de 20 minutos, no local de sua preferência. Haveria disponibilidade nas próximas semanas?
 
-Abraço,
-Thiago
+Atenciosamente,
+Thiago Antunes
 =====
-REVISÃO
-
-Correções feitas
-1. Assinaturas removidas dos 4 e-mails ([Seu nome], [Cargo], [WhatsApp] e o e-mail). Todos terminam em "Abraço,".
-2. Jundiá: tirei "24 Torino e 3 Senior indo para Mairinque". A fonte é ambígua sobre quais modelos vão para Mairinque, então ficou só "29 ônibus Marcopolo novos, os primeiros Torino da operadora", que está marcado como evidência. Tirei também a "comprovação para o poder concedente" (era hipótese). "Torino" no assunto ficou com maiúscula.
-3. SuperFrio: troquei "ainda rodam no papel?" por uma frase neutra, porque soava condescendente para uma empresa com TI própria. "Integra com o que vocês já usam" virou "complementar os sistemas que vocês já usam", sem prometer integração. Saiu "cotacao@" do PARA, que agora tem um endereço só; ele aparece na observação como alternativa.
-4. KP: tirei a menção à região de São Roque e Mairinque, porque os endereços publicados são em São Paulo e Campinas e podia sugerir que a KP fica em Mairinque. Corrigi a enumeração sem artigos ("temperatura... e checklist") e tirei o checklist pré-viagem para encurtar a lista.
-5. Loginter: troquei a tríade de CNAEs (despacho aduaneiro, agenciamento, multimodal), tirada de agregadores, pela descrição pública do diretório (importação e exportação na América Latina, foco no Mercosul). Carga química continua fora.
-6. Clareza: nos quatro e-mails o uMov.me agora aparece explicado em poucas palavras ("plataforma de aplicativos para equipes de campo"). Cada e-mail ficou com uma única pergunta de chamada para ação; as perguntas de diagnóstico ("Como vocês fazem hoje?", "Acontece aí?") viraram afirmações.
-7. Português: sem travessões nem clichês; revisei concordância e vírgulas.
-
-Conferir antes de enviar
-- Se a MobiActio é mesmo da região de São Roque e Mairinque (Jundiá, SuperFrio e Loginter usam isso como "vizinhos").
-- Se o uMov.me funciona offline e integra com TOTVS da forma descrita.
+CONFERIR ANTES DE ENVIAR
+- Se o uMov.me funciona sem internet e integra com TOTVS da forma descrita.
 - Jundiá: confirme o número de 29 ônibus e a frase "primeiros Torino da operadora" nas matérias da Technibus e da AutoIndústria (mai/2026).
-- SuperFrio: a data do anúncio do pátio de 210 TEUs é incerta, então não cite ano.
-- Loginter: o endereço é um Gmail tirado de agregador, e a empresa pode estar inativa. Ligue antes.
+- SuperFrio: a data do anúncio do pátio de 210 TEUs é incerta, por isso o e-mail não cita ano.
+- Loginter: o endereço é um Gmail obtido em agregador e a empresa pode estar inativa. Ligue antes.
 - KP: o e-mail logistica@ (sem acento) foi deduzido do site, que mostra "logística@". Confirme por telefone.
+- Ao colar no Outlook, insira sua assinatura em Inserir > Assinatura (pode remover o "Thiago Antunes" do fim se a assinatura já tiver o nome).
