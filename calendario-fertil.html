@@ -57,6 +57,7 @@
   .day.fertile{background:var(--fertile)}
   .day.ovul{background:var(--fertile);box-shadow:inset 0 0 0 2px var(--ovul)}
   .day.today{outline:2px solid var(--today);outline-offset:-2px}
+  .day.rec{background-image:repeating-linear-gradient(45deg,transparent 0 6px,rgba(46,125,50,.25) 6px 8px)}
   .day .n{font-weight:600}
   .day .lbl{font-size:.65rem;position:absolute;bottom:3px;left:4px;right:4px;line-height:1.1}
   .dots{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
@@ -122,14 +123,15 @@
     <div class="grid" id="grid"></div>
     <div class="legend">
       <span><i style="background:var(--period)"></i>Menstruação</span>
-      <span><i style="background:var(--fertile)"></i>Período fértil</span>
+      <span><i style="background:var(--fertile)"></i>Fértil (previsto)</span>
+      <span><i style="background:var(--fertile) repeating-linear-gradient(45deg,transparent 0 3px,rgba(46,125,50,.45) 3px 5px)"></i>Fértil (registrado)</span>
       <span><i style="background:var(--fertile);box-shadow:inset 0 0 0 2px var(--ovul)"></i>Ovulação (estimada)</span>
       <span><i style="outline:2px solid var(--today);outline-offset:-2px"></i>Hoje</span>
     </div>
   </section>
 </main>
 
-<p class="note">⚠️ As datas são <b>estimativas</b> pelo método do calendário (ovulação ≈ 14 dias antes da próxima menstruação; janela fértil = 5 dias antes até 1 dia depois). Ciclos variam bastante — isto <b>não</b> serve como método contraceptivo. Os dados ficam salvos só neste navegador (use “Backup” para não perder).</p>
+<p class="note">⚠️ As datas são <b>estimativas</b> pelo método do calendário (ovulação ≈ 14 dias antes da próxima menstruação — ou a fase lútea calculada pelos períodos férteis registrados; janela fértil = 5 dias antes até 1 dia depois da ovulação). Ciclos variam bastante — isto <b>não</b> serve como método contraceptivo. Os dados ficam salvos só neste navegador (use “Backup” para não perder).</p>
 
 <dialog id="dlg">
   <form id="form" method="dialog">
@@ -146,12 +148,24 @@
       <label>Duração do ciclo (dias)<input name="cycle" type="number" min="20" max="45" value="28"></label>
     </div>
     <label>Duração da menstruação (dias)<input name="period" type="number" min="2" max="10" value="5"></label>
+    <div class="two">
+      <label>Último período fértil – início<input name="fStart" type="date"></label>
+      <label>Último período fértil – fim<input name="fEnd" type="date"></label>
+    </div>
     <div><small style="color:var(--muted)">Cor</small><div class="colors" id="colors"></div></div>
     <div class="row" style="justify-content:flex-end;margin-top:6px">
       <button type="button" id="cancel">Cancelar</button>
       <button class="primary" type="submit">Salvar</button>
     </div>
   </form>
+</dialog>
+
+<dialog id="dayDlg">
+  <div style="padding:18px;display:grid;gap:8px">
+    <strong id="dayTitle" style="text-transform:capitalize"></strong>
+    <div id="dayOpts" style="display:grid;gap:8px"></div>
+    <button type="button" onclick="dayDlg.close()">Cancelar</button>
+  </div>
 </dialog>
 
 <script>
@@ -192,17 +206,48 @@ function cycleLen(w){
   return Number(w.cycle)||28;
 }
 
+// Períodos férteis registrados (reais), ordenados
+function fertiles(w){ return (w.fertiles||[]).map(f=>({s:parse(f.start),e:parse(f.end)})).sort((a,b)=>a.s-b.s); }
+// Ovulação estimada dentro de um período fértil registrado (penúltimo dia; ou o próprio dia se for curto)
+function ovOf(f){ return diff(f.e,f.s)+1>=3 ? add(f.e,-1) : f.e; }
+function recordedAt(w,d){ return fertiles(w).find(f=>diff(d,f.s)>=0 && diff(f.e,d)>=0); }
+
+// Fase lútea (ovulação -> próxima menstruação). Calculada a partir dos férteis registrados; padrão 14
+function luteal(w){
+  const s=starts(w), vals=[];
+  fertiles(w).forEach(f=>{ const ov=ovOf(f), nx=s.find(x=>diff(x,ov)>0);
+    if(nx){ const l=diff(nx,ov); if(l>=9 && l<=18) vals.push(l); } });
+  if(!vals.length) return {v:14, calc:false};
+  const last=vals.slice(-6); return {v:Math.round(last.reduce((a,b)=>a+b,0)/last.length), calc:true};
+}
+
+// Inícios de ciclo: registrados + o próximo previsto a partir do último fértil registrado
+function anchors(w){
+  const s=starts(w), fs=fertiles(w);
+  if(fs.length){
+    const ov=ovOf(fs[fs.length-1]), last=s[s.length-1];
+    if(!last || diff(ov,last)>0) s.push(add(ov,luteal(w).v));
+  }
+  return s;
+}
+
 // Status de um dia: 'period' | 'fertile' | 'ovul' | null
 function statusOn(w, d){
-  const s=starts(w); if(!s.length) return null;
+  const rec=recordedAt(w,d);
+  if(rec) return diff(d,ovOf(rec))===0 ? 'ovul' : 'fertile';
+  const s=anchors(w); if(!s.length) return null;
   let i=-1; for(let k=0;k<s.length;k++) if(diff(d,s[k])>=0) i=k;
   if(i<0) return null;
-  const C=cycleLen(w), P=Number(w.period)||5;
+  const C=cycleLen(w), P=Number(w.period)||5, L=luteal(w).v;
   let base=s[i], len;
   if(i<s.length-1){ len=diff(s[i+1],base); }
   else { const k=Math.floor(diff(d,base)/C); base=add(base,k*C); len=C; }
-  const day=diff(d,base), ov=len-14;
+  const day=diff(d,base);
   if(day<P) return 'period';
+  // se esse ciclo já tem fértil registrado, ele substitui a estimativa
+  const end=add(base,len);
+  if(fertiles(w).some(f=>diff(f.e,base)>=0 && diff(end,f.s)>0)) return null;
+  const ov=len-L;
   if(day===ov) return 'ovul';
   if(day>=ov-5 && day<=ov+1) return 'fertile';
   return null;
@@ -211,7 +256,7 @@ const isFert = st => st==='fertile' || st==='ovul';
 
 // Próxima (ou atual) janela fértil a partir de hoje
 function nextWindow(w){
-  if(!w.periods.length) return null;
+  if(!w.periods.length && !(w.fertiles||[]).length) return null;
   const t=today(), C=cycleLen(w);
   for(let i=0;i<=C*2;i++){
     const d=add(t,i);
@@ -226,7 +271,7 @@ function nextWindow(w){
 }
 
 function statusText(w){
-  if(!w.periods.length) return {txt:'Sem data registrada', cls:''};
+  if(!w.periods.length && !(w.fertiles||[]).length) return {txt:'Sem data registrada', cls:''};
   const n=nextWindow(w); if(!n) return {txt:'—',cls:''};
   if(n.now) return {txt:`🔥 Fértil agora (até ${br(n.end)})`, cls:'hot'};
   if(n.inDays<=3) return {txt:`⏳ Fértil em ${n.inDays} dia${n.inDays>1?'s':''} (${br(n.start)}–${br(n.end)})`, cls:'soon'};
@@ -264,6 +309,9 @@ function renderDetails(){
   if(!w){ el.innerHTML=''; return; }
   const likes=(w.likes||'').split(',').map(s=>s.trim()).filter(Boolean);
   const hist=[...new Set(w.periods)].sort().reverse();
+  w.fertiles=w.fertiles||[];
+  const fhist=[...w.fertiles].sort((a,b)=>b.start.localeCompare(a.start));
+  const lut=luteal(w);
   el.innerHTML=`<hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
     <div class="row" style="justify-content:space-between"><strong>Detalhes de ${esc(w.name)}</strong>
       <span class="row"><button class="small" id="dEdit">Editar</button><button class="small danger" id="dDel">Excluir</button></span></div>
@@ -273,10 +321,20 @@ function renderDetails(){
       <dt>Do que gosta</dt><dd>${likes.length?`<div class="tags">${likes.map(l=>`<span class="tag">${esc(l)}</span>`).join('')}</div>`:'—'}</dd>
       ${w.notes?`<dt>Observações</dt><dd>${esc(w.notes)}</dd>`:''}
       <dt>Ciclo médio</dt><dd>${cycleLen(w)} dias · menstruação ${w.period||5} dias</dd>
+      <dt>Fase lútea (ovulação → menstruação)</dt><dd>${lut.v} dias ${lut.calc?'<small style="color:var(--hot)">· calculada pelos férteis registrados</small>':'<small style="color:var(--muted)">· padrão (registre férteis + menstruação seguinte para ajustar)</small>'}</dd>
       <dt>Inícios de menstruação registrados</dt>
       <dd><div class="hist">${hist.length?hist.map(h=>`<span>${parse(h).toLocaleDateString('pt-BR')}<b data-h="${h}" title="Remover">×</b></span>`).join(''):'Nenhum'}</div>
         <div class="row" style="margin-top:8px"><input type="date" id="newDate" style="width:auto"><button class="small primary" id="addDate">Registrar</button></div></dd>
+      <dt>Períodos férteis registrados</dt>
+      <dd><div class="hist">${fhist.length?fhist.map((f,i)=>`<span>${parse(f.start).toLocaleDateString('pt-BR')}${f.end!==f.start?' – '+parse(f.end).toLocaleDateString('pt-BR'):''}<b data-f="${i}" title="Remover">×</b></span>`).join(''):'Nenhum'}</div>
+        <div class="row" style="margin-top:8px"><input type="date" id="fStart" style="width:auto" title="Início"><span>até</span><input type="date" id="fEnd" style="width:auto" title="Fim"><button class="small primary" id="addFert">Registrar</button></div></dd>
     </dl>`;
+  document.getElementById('addFert').onclick=()=>{
+    const a=document.getElementById('fStart').value, b=document.getElementById('fEnd').value||a;
+    if(!a) return alert('Informe ao menos a data de início.');
+    addFertile(w, a<=b?a:b, a<=b?b:a);
+  };
+  el.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{ const f=fhist[b.dataset.f]; w.fertiles=w.fertiles.filter(x=>x!==f); save(); render(); });
   document.getElementById('dEdit').onclick=()=>openForm(w);
   document.getElementById('dDel').onclick=()=>{ if(confirm(`Excluir ${w.name}?`)){ state.women=state.women.filter(x=>x.id!==w.id); selected=null; save(); render(); } };
   document.getElementById('addDate').onclick=()=>{ const v=document.getElementById('newDate').value; if(v){ addPeriod(w,v); } };
@@ -285,11 +343,33 @@ function renderDetails(){
 
 function addPeriod(w,v){ if(!w.periods.includes(v)) w.periods.push(v); save(); render(); }
 
+// Adiciona um período fértil, juntando com outros que se encostem/sobreponham
+function addFertile(w,a,b){
+  w.fertiles=w.fertiles||[];
+  let s=parse(a), e=parse(b);
+  w.fertiles=w.fertiles.filter(f=>{
+    const fs=parse(f.start), fe=parse(f.end);
+    if(diff(fs,e)<=1 && diff(s,fe)<=1){ if(fs<s) s=fs; if(fe>e) e=fe; return false; }
+    return true;
+  });
+  w.fertiles.push({start:iso(s),end:iso(e)}); save(); render();
+}
+function removeFertileDay(w,v){
+  const d=parse(v), out=[];
+  (w.fertiles||[]).forEach(f=>{
+    const fs=parse(f.start), fe=parse(f.end);
+    if(diff(d,fs)<0 || diff(fe,d)<0){ out.push(f); return; }
+    if(diff(d,fs)>0) out.push({start:f.start,end:iso(add(d,-1))});
+    if(diff(fe,d)>0) out.push({start:iso(add(d,1)),end:f.end});
+  });
+  w.fertiles=out; save(); render();
+}
+
 function renderCalendar(){
   document.getElementById('monthTitle').textContent=view.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
   const w=byId(selected);
   document.getElementById('calHint').textContent = w
-    ? `Mostrando ${w.name}. Clique num dia para registrar início da menstruação.`
+    ? `Mostrando ${w.name}. Clique num dia para registrar menstruação ou dia fértil.`
     : 'Mostrando todas. Selecione uma para ver detalhes.';
   const g=document.getElementById('grid');
   let html=['D','S','T','Q','Q','S','S'].map(d=>`<div class="wd">${d}</div>`).join('');
@@ -300,8 +380,10 @@ function renderCalendar(){
     if(w){
       const st=statusOn(w,d);
       if(st) cls+=' '+st;
+      if(recordedAt(w,d)) cls+=' rec';
       if(w.periods.includes(iso(d))) inner+='<div class="lbl">🩸 início</div>';
       else if(st==='ovul') inner+='<div class="lbl">ovulação</div>';
+      else if(recordedAt(w,d)) inner+='<div class="lbl">✓ fértil</div>';
     } else {
       const dots=state.women.map(x=>{ const st=statusOn(x,d); if(!st) return '';
         const c=st==='period'?'p':st==='ovul'?'o':''; return `<span class="dot ${c}" title="${esc(x.name)}: ${st==='period'?'menstruação':st==='ovul'?'ovulação':'fértil'}" style="background:${x.color}"></span>`; }).join('');
@@ -313,9 +395,24 @@ function renderCalendar(){
   g.querySelectorAll('.day').forEach(c=>c.onclick=()=>{
     const w=byId(selected); const v=c.dataset.d;
     if(!w){ if(state.women.length) alert('Selecione uma mulher na lista para registrar datas.'); return; }
-    if(w.periods.includes(v)){ if(confirm(`Remover ${parse(v).toLocaleDateString('pt-BR')} do histórico de ${w.name}?`)){ w.periods=w.periods.filter(p=>p!==v); save(); render(); } }
-    else if(confirm(`Registrar ${parse(v).toLocaleDateString('pt-BR')} como início da menstruação de ${w.name}?`)) addPeriod(w,v);
+    openDayMenu(w,v);
   });
+}
+
+/* ---------- menu ao clicar num dia ---------- */
+const dayDlg=document.getElementById('dayDlg');
+function openDayMenu(w,v){
+  const isP=w.periods.includes(v), isF=!!recordedAt(w,parse(v));
+  document.getElementById('dayTitle').textContent=`${parse(v).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})} · ${w.name}`;
+  const opts=[
+    isP ? ['🩸 Remover início da menstruação',()=>{ w.periods=w.periods.filter(p=>p!==v); save(); render(); }]
+        : ['🩸 Início da menstruação',()=>addPeriod(w,v)],
+    isF ? ['🌿 Remover este dia do período fértil',()=>removeFertileDay(w,v)]
+        : ['🌿 Marcar como dia fértil',()=>addFertile(w,v,v)],
+  ];
+  const box=document.getElementById('dayOpts'); box.innerHTML='';
+  opts.forEach(([t,fn])=>{ const b=document.createElement('button'); b.type='button'; b.textContent=t; b.onclick=()=>{ dayDlg.close(); fn(); }; box.appendChild(b); });
+  dayDlg.showModal();
 }
 
 function render(){ renderAlerts(); renderList(); renderDetails(); renderCalendar(); }
@@ -329,7 +426,8 @@ function openForm(w){
   document.getElementById('formTitle').textContent=w?`Editar ${w.name}`:'Nova mulher';
   const used=state.women.map(x=>x.color);
   const color=w?w.color:(COLORS.find(c=>!used.includes(c))||COLORS[state.women.length%COLORS.length]);
-  if(w){ ['name','age','from','likes','notes','cycle','period'].forEach(k=>form[k].value=w[k]??''); form.last.value=[...w.periods].sort().pop()||''; }
+  if(w){ ['name','age','from','likes','notes','cycle','period'].forEach(k=>form[k].value=w[k]??''); form.last.value=[...w.periods].sort().pop()||'';
+    const lf=[...(w.fertiles||[])].sort((a,b)=>a.start.localeCompare(b.start)).pop(); if(lf){ form.fStart.value=lf.start; form.fEnd.value=lf.end; } }
   form.querySelector(`input[value="${color}"]`).checked=true;
   dlg.showModal();
 }
@@ -339,8 +437,10 @@ form.onsubmit=e=>{
   e.preventDefault();
   const f=Object.fromEntries(new FormData(form));
   const data={name:f.name.trim(),age:f.age,from:f.from.trim(),likes:f.likes,notes:f.notes.trim(),cycle:Number(f.cycle)||28,period:Number(f.period)||5,color:f.color};
-  if(editingId){ const w=byId(editingId); Object.assign(w,data); if(f.last && !w.periods.includes(f.last)) w.periods.push(f.last); }
-  else { const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6); state.women.push({id,...data,periods:f.last?[f.last]:[]}); selected=id; }
+  let w;
+  if(editingId){ w=byId(editingId); Object.assign(w,data); if(f.last && !w.periods.includes(f.last)) w.periods.push(f.last); }
+  else { const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6); w={id,...data,periods:f.last?[f.last]:[],fertiles:[]}; state.women.push(w); selected=id; }
+  if(f.fStart){ const b=f.fEnd||f.fStart; addFertile(w, f.fStart<=b?f.fStart:b, f.fStart<=b?b:f.fStart); }
   save(); dlg.close(); render();
 };
 
