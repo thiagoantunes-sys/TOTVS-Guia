@@ -2,171 +2,299 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#c2185b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Fértil">
 <title>Calendário Fértil</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌸</text></svg>">
 <style>
   :root{
-    --bg:#faf7f8; --card:#fff; --text:#2a2226; --muted:#7a6d73; --line:#ece3e6;
-    --accent:#c2185b; --accent-soft:#fce4ec;
-    --period:#ef9a9a; --fertile:#a5d6a7; --ovul:#2e7d32; --today:#c2185b;
-    --warn-bg:#fff3e0; --warn:#e65100; --hot-bg:#e8f5e9; --hot:#1b5e20;
-    --shadow:0 2px 10px rgba(0,0,0,.06);
+    --bg:#f7f3f5; --card:#fff; --text:#2a2226; --muted:#8a7c83; --line:#eee5e9;
+    --accent:#c2185b; --accent-soft:#fce4ec; --on-accent:#fff;
+    --period:#f4a7ac; --fertile:#a8dbab; --ovul:#2e7d32; --today:#c2185b;
+    --warn-bg:#fff3e0; --warn:#d35400; --hot-bg:#e6f4e7; --hot:#1b5e20;
+    --shadow:0 4px 18px rgba(80,20,50,.08);
+    --tab-h:64px;
   }
   @media (prefers-color-scheme: dark){
     :root{
-      --bg:#17131a; --card:#221c25; --text:#f1e9ee; --muted:#a898a2; --line:#352c39;
-      --accent:#f06292; --accent-soft:#3a2230;
-      --period:#8e3b46; --fertile:#2f5e35; --ovul:#81c784; --today:#f06292;
-      --warn-bg:#3a2a16; --warn:#ffb74d; --hot-bg:#1c3320; --hot:#a5d6a7;
-      --shadow:0 2px 10px rgba(0,0,0,.4);
+      --bg:#141016; --card:#211b24; --text:#f3eaf0; --muted:#a395a0; --line:#332a37;
+      --accent:#f06292; --accent-soft:#3b2231; --on-accent:#1a0f15;
+      --period:#8e3b46; --fertile:#2f5e35; --ovul:#9ccc65; --today:#f06292;
+      --warn-bg:#3a2a16; --warn:#ffb74d; --hot-bg:#1b3220; --hot:#a5d6a7;
+      --shadow:0 4px 18px rgba(0,0,0,.45);
     }
   }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text)}
-  header{padding:20px 16px 8px;max-width:1100px;margin:auto;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
-  h1{margin:0;font-size:1.5rem}
-  h1 span{color:var(--accent)}
-  main{max-width:1100px;margin:auto;padding:8px 16px 40px;display:grid;gap:16px;grid-template-columns:340px 1fr}
-  @media (max-width:820px){main{grid-template-columns:1fr}}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
-  button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);padding:8px 12px}
-  button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
-  button.small{padding:4px 8px;font-size:.85rem}
-  button.danger{color:#d32f2f}
-  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  #alerts{max-width:1100px;margin:auto;padding:0 16px;display:grid;gap:8px}
-  .alert{border-radius:12px;padding:10px 14px;display:flex;gap:10px;align-items:center}
-  .alert.hot{background:var(--hot-bg);color:var(--hot);font-weight:600}
-  .alert.soon{background:var(--warn-bg);color:var(--warn)}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);
+       overscroll-behavior-y:contain;-webkit-font-smoothing:antialiased}
+  button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input,textarea{font:inherit;font-size:16px} /* 16px evita zoom no iPhone */
+
+  /* ---------- barra superior ---------- */
+  .appbar{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);
+          backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+          padding:calc(env(safe-area-inset-top) + 12px) 16px 10px;display:flex;align-items:center;justify-content:space-between}
+  .appbar h1{margin:0;font-size:1.35rem;letter-spacing:-.01em}
+  .appbar h1 span{color:var(--accent)}
+  .fab{width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--on-accent);font-size:1.6rem;line-height:1;
+       display:grid;place-items:center;box-shadow:var(--shadow)}
+  .fab:active{transform:scale(.94)}
+
+  /* ---------- views ---------- */
+  main{padding:4px 16px calc(var(--tab-h) + env(safe-area-inset-bottom) + 20px);max-width:560px;margin:auto}
+  .view{display:none;animation:fade .2s ease}
+  .view.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .sec-title{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:18px 4px 8px;font-weight:600}
+
+  .card{background:var(--card);border-radius:20px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+  .empty{text-align:center;color:var(--muted);padding:40px 20px}
+  .empty .big{font-size:3rem;margin-bottom:8px}
+  .btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 18px;border-radius:14px;
+       background:var(--accent-soft);color:var(--accent);font-weight:600;width:100%}
+  .btn.primary{background:var(--accent);color:var(--on-accent)}
+  .btn.ghost{background:var(--bg);color:var(--text)}
+  .btn.danger{background:transparent;color:#e53935}
+  .btn:active{transform:scale(.98)}
+  .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .btns .btn{padding:0 8px;font-size:.92rem;white-space:nowrap}
+
   .dot{width:12px;height:12px;border-radius:50%;flex:none;display:inline-block}
-  .girl{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;cursor:pointer;transition:.15s}
-  .girl.sel{border-color:var(--accent);background:var(--accent-soft)}
-  .girl h3{margin:0;font-size:1.05rem;display:flex;gap:8px;align-items:center}
-  .meta{color:var(--muted);font-size:.85rem;margin:4px 0}
-  .status{font-size:.85rem;margin-top:6px;font-weight:600}
-  .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-  .tag{background:var(--accent-soft);color:var(--accent);font-size:.75rem;padding:2px 8px;border-radius:99px}
-  .empty{color:var(--muted);text-align:center;padding:20px}
-  .cal-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-  .cal-head h2{margin:0;font-size:1.2rem;text-transform:capitalize}
-  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-  .wd{text-align:center;font-size:.75rem;color:var(--muted);padding:4px 0}
-  .day{min-height:64px;border:1px solid var(--line);border-radius:8px;padding:4px;font-size:.85rem;position:relative;cursor:pointer;background:var(--card)}
+  .avatar{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:1.2rem;flex:none}
+
+  /* ---------- início ---------- */
+  .hero{border-radius:22px;padding:18px;margin-bottom:12px;display:flex;gap:14px;align-items:center;box-shadow:var(--shadow)}
+  .hero.hot{background:var(--hot-bg);color:var(--hot)}
+  .hero.soon{background:var(--warn-bg);color:var(--warn)}
+  .hero .t{font-weight:700;font-size:1.05rem}
+  .hero .s{font-size:.9rem;opacity:.85;margin-top:2px}
+  .gcard{display:flex;gap:12px;align-items:center;cursor:pointer}
+  .gcard .info{flex:1;min-width:0}
+  .gcard .name{font-weight:700;font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gcard .sub{color:var(--muted);font-size:.85rem;margin-top:2px}
+  .gcard .st{font-size:.88rem;font-weight:600;margin-top:4px}
+  .bar{height:6px;border-radius:99px;background:var(--line);margin-top:10px;position:relative;overflow:hidden}
+  .bar i{position:absolute;top:0;bottom:0;border-radius:99px}
+  .chev{color:var(--muted);font-size:1.3rem}
+
+  /* ---------- calendário ---------- */
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:99px;background:var(--card);box-shadow:var(--shadow);font-weight:600;font-size:.9rem;min-height:40px}
+  .chip.on{background:var(--accent);color:var(--on-accent)}
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .cal-head h2{margin:0;font-size:1.15rem;text-transform:capitalize}
+  .nav{width:40px;height:40px;border-radius:12px;background:var(--bg);font-size:1.3rem}
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;touch-action:pan-y}
+  .wd{text-align:center;font-size:.72rem;color:var(--muted);padding:4px 0;font-weight:600}
+  .day{aspect-ratio:1/1.1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:6px;
+       font-size:.92rem;font-weight:600;position:relative;background:var(--bg)}
+  .day:active{transform:scale(.94)}
   .day.out{opacity:.35}
   .day.period{background:var(--period)}
   .day.fertile{background:var(--fertile)}
   .day.ovul{background:var(--fertile);box-shadow:inset 0 0 0 2px var(--ovul)}
-  .day.today{outline:2px solid var(--today);outline-offset:-2px}
-  .day.rec{background-image:repeating-linear-gradient(45deg,transparent 0 6px,rgba(46,125,50,.25) 6px 8px)}
-  .day .n{font-weight:600}
-  .day .lbl{font-size:.65rem;position:absolute;bottom:3px;left:4px;right:4px;line-height:1.1}
-  .dots{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
-  .dots .dot{width:9px;height:9px}
-  .dots .dot.p{opacity:.45}
-  .dots .dot.o{box-shadow:0 0 0 2px var(--ovul)}
-  .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:.8rem;color:var(--muted);margin-top:12px}
-  .legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:4px}
-  .details dt{font-size:.75rem;color:var(--muted);margin-top:8px}
-  .details dd{margin:2px 0 0}
-  .hist{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-  .hist span{border:1px solid var(--line);border-radius:8px;padding:2px 8px;font-size:.8rem;display:flex;gap:6px;align-items:center}
-  .hist b{cursor:pointer;color:#d32f2f}
-  dialog{border:none;border-radius:16px;padding:0;max-width:460px;width:calc(100% - 32px);background:var(--card);color:var(--text)}
-  dialog::backdrop{background:rgba(0,0,0,.45)}
-  form{padding:18px;display:grid;gap:10px}
-  form h2{margin:0 0 4px}
-  label{font-size:.8rem;color:var(--muted);display:grid;gap:4px}
-  input,textarea{font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text);width:100%}
-  textarea{min-height:60px;resize:vertical}
+  .day.rec{background-image:repeating-linear-gradient(45deg,transparent 0 5px,rgba(46,125,50,.28) 5px 7px)}
+  .day.today{outline:2.5px solid var(--today);outline-offset:-2.5px}
+  .day .ic{font-size:.7rem;position:absolute;bottom:3px}
+  .dots{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;margin-top:3px;padding:0 2px}
+  .dots .dot{width:7px;height:7px}
+  .dots .dot.p{opacity:.4}
+  .dots .dot.o{box-shadow:0 0 0 1.5px var(--ovul)}
+  .legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.78rem;color:var(--muted);margin-top:14px}
+  .legend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px}
+  .hint{font-size:.8rem;color:var(--muted);text-align:center;margin-top:10px}
+
+  /* ---------- barra de abas ---------- */
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:color-mix(in srgb,var(--card) 92%,transparent);
+          backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);
+          display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom)}
+  .tab{height:var(--tab-h);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted);font-size:.7rem;font-weight:600;position:relative}
+  .tab .i{font-size:1.35rem;line-height:1;filter:grayscale(1);opacity:.7}
+  .tab.on{color:var(--accent)}
+  .tab.on .i{filter:none;opacity:1}
+  .badge{position:absolute;top:8px;left:calc(50% + 6px);min-width:18px;height:18px;border-radius:9px;background:var(--accent);color:var(--on-accent);font-size:.7rem;display:grid;place-items:center;padding:0 5px}
+
+  /* ---------- bottom sheets ---------- */
+  dialog.sheet{border:none;padding:0;margin:auto auto 0;width:100%;max-width:560px;max-height:92vh;max-height:92dvh;
+               border-radius:24px 24px 0 0;background:var(--card);color:var(--text);overflow:auto;
+               padding-bottom:env(safe-area-inset-bottom)}
+  dialog.sheet[open]{animation:up .25s cubic-bezier(.2,.8,.2,1)}
+  @keyframes up{from{transform:translateY(100%)}to{transform:none}}
+  dialog.sheet::backdrop{background:rgba(0,0,0,.45)}
+  .grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:10px auto 2px}
+  .sheet-body{padding:8px 18px 20px}
+  .sheet-body h2{margin:6px 0 14px;font-size:1.25rem}
+  .sheet-top{display:flex;align-items:center;justify-content:space-between}
+  .x{width:36px;height:36px;border-radius:50%;background:var(--bg);font-size:1.1rem}
+
+  form{display:grid;gap:12px}
+  label{font-size:.8rem;color:var(--muted);display:grid;gap:6px;font-weight:600}
+  input,textarea{padding:12px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--text);width:100%;min-width:0;max-width:100%;min-height:48px;display:block}
+  input[type=date]{-webkit-appearance:none;appearance:none;padding-right:8px}
+  label,.two>*{min-width:0}
+  dialog.sheet{overflow-x:hidden}
+  .chip.on .dot{box-shadow:0 0 0 2px #fff}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  textarea{min-height:70px;resize:vertical}
   .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .colors{display:flex;gap:6px;flex-wrap:wrap}
+  fieldset{border:none;padding:0;margin:4px 0 0;display:grid;gap:10px}
+  legend{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700;margin-bottom:4px;padding:0}
+  .colors{display:flex;gap:10px;flex-wrap:wrap}
   .colors input{display:none}
-  .colors label{width:26px;height:26px;border-radius:50%;cursor:pointer;border:3px solid transparent}
+  .colors label{width:34px;height:34px;border-radius:50%;cursor:pointer;border:3px solid transparent}
   .colors input:checked+label{border-color:var(--text)}
-  .note{font-size:.75rem;color:var(--muted);max-width:1100px;margin:0 auto;padding:0 16px 24px}
+
+  /* perfil */
+  .prof-head{display:flex;gap:14px;align-items:center;margin:6px 0 14px}
+  .prof-head .avatar{width:60px;height:60px;font-size:1.5rem}
+  .prof-head h2{margin:0}
+  .tags{display:flex;flex-wrap:wrap;gap:6px}
+  .tag{background:var(--accent-soft);color:var(--accent);font-size:.82rem;padding:5px 11px;border-radius:99px;font-weight:600}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;font-size:.92rem;margin:12px 0}
+  .kv dt{color:var(--muted)}
+  .kv dd{margin:0;text-align:right;font-weight:600}
+  .hist{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+  .hist span{background:var(--bg);border-radius:10px;padding:6px 6px 6px 10px;font-size:.85rem;display:flex;gap:4px;align-items:center}
+  .hist button{width:26px;height:26px;border-radius:50%;color:#e53935;font-weight:700}
+  .add-row{display:flex;gap:8px;align-items:center}
+  .add-row input{flex:1;min-width:0}
+  .add-row .btn{width:auto;flex:none}
+  .muted{color:var(--muted);font-size:.85rem}
+
+  .opts{display:grid;gap:10px}
+  .opt{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 16px;border-radius:14px;background:var(--bg);font-weight:600;text-align:left;width:100%}
+  .opt .e{font-size:1.4rem}
+
+  .toast{position:fixed;left:50%;bottom:calc(var(--tab-h) + env(safe-area-inset-bottom) + 14px);transform:translate(-50%,20px);
+         background:var(--text);color:var(--bg);padding:12px 18px;border-radius:14px;font-size:.9rem;font-weight:600;
+         opacity:0;pointer-events:none;transition:.25s;z-index:20;max-width:calc(100% - 32px);text-align:center}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+  .note{font-size:.8rem;color:var(--muted);line-height:1.5}
+  .row-item{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 4px;border-bottom:1px solid var(--line);width:100%;text-align:left;font-weight:600}
+  .row-item:last-child{border-bottom:none}
+  .row-item .e{font-size:1.3rem;width:28px;text-align:center}
 </style>
 </head>
 <body>
-<header>
-  <h1>🌸 Calendário <span>Fértil</span></h1>
-  <div class="row">
-    <button class="primary" id="btnAdd">+ Adicionar mulher</button>
-    <button id="btnNotif" title="Avisar pelo navegador">🔔 Notificações</button>
-    <button id="btnExport" title="Baixar backup">⬇ Backup</button>
-    <button id="btnImport" title="Restaurar backup">⬆ Restaurar</button>
-    <input type="file" id="fileImport" accept="application/json" hidden>
-  </div>
+
+<header class="appbar">
+  <h1>🌸 <span>Fértil</span></h1>
+  <button class="fab" id="btnAdd" aria-label="Adicionar mulher">+</button>
 </header>
 
-<section id="alerts"></section>
-
 <main>
-  <aside class="card">
-    <div class="row" style="justify-content:space-between;margin-bottom:10px">
-      <strong>Mulheres</strong>
-      <button class="small" id="btnAll">Ver todas</button>
-    </div>
-    <div id="list"></div>
-    <div id="details"></div>
-  </aside>
+  <!-- INÍCIO -->
+  <section class="view on" id="v-home"></section>
 
-  <section class="card">
-    <div class="cal-head">
-      <button id="prev">‹</button>
-      <h2 id="monthTitle"></h2>
-      <button id="next">›</button>
+  <!-- CALENDÁRIO -->
+  <section class="view" id="v-cal">
+    <div class="chips" id="chips"></div>
+    <div class="card">
+      <div class="cal-head">
+        <button class="nav" id="prev" aria-label="Mês anterior">‹</button>
+        <h2 id="monthTitle"></h2>
+        <button class="nav" id="next" aria-label="Próximo mês">›</button>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="legend">
+        <span><i style="background:var(--period)"></i>Menstruação</span>
+        <span><i style="background:var(--fertile)"></i>Fértil (previsto)</span>
+        <span><i style="background:var(--fertile) repeating-linear-gradient(45deg,transparent 0 3px,rgba(46,125,50,.5) 3px 5px)"></i>Fértil (registrado)</span>
+        <span><i style="background:var(--fertile);box-shadow:inset 0 0 0 2px var(--ovul)"></i>Ovulação</span>
+      </div>
     </div>
-    <div class="row" style="justify-content:space-between;margin-bottom:8px">
-      <small id="calHint" style="color:var(--muted)"></small>
-      <button class="small" id="btnToday">Hoje</button>
+    <div class="hint" id="calHint"></div>
+  </section>
+
+  <!-- MULHERES -->
+  <section class="view" id="v-girls"></section>
+
+  <!-- MAIS -->
+  <section class="view" id="v-more">
+    <div class="sec-title">Ajustes</div>
+    <div class="card" style="padding:4px 14px">
+      <button class="row-item" id="btnNotif"><span class="e">🔔</span>Ativar notificações</button>
+      <button class="row-item" id="btnExport"><span class="e">⬇️</span>Fazer backup (baixar arquivo)</button>
+      <button class="row-item" id="btnImport"><span class="e">⬆️</span>Restaurar backup</button>
     </div>
-    <div class="grid" id="grid"></div>
-    <div class="legend">
-      <span><i style="background:var(--period)"></i>Menstruação</span>
-      <span><i style="background:var(--fertile)"></i>Fértil (previsto)</span>
-      <span><i style="background:var(--fertile) repeating-linear-gradient(45deg,transparent 0 3px,rgba(46,125,50,.45) 3px 5px)"></i>Fértil (registrado)</span>
-      <span><i style="background:var(--fertile);box-shadow:inset 0 0 0 2px var(--ovul)"></i>Ovulação (estimada)</span>
-      <span><i style="outline:2px solid var(--today);outline-offset:-2px"></i>Hoje</span>
+    <input type="file" id="fileImport" accept="application/json,.json" hidden>
+    <div class="sec-title">Instalar no celular</div>
+    <div class="card note">
+      <b>iPhone (Safari):</b> toque em Compartilhar ⬆️ → “Adicionar à Tela de Início”.<br>
+      <b>Android (Chrome):</b> menu ⋮ → “Adicionar à tela inicial”.<br>
+      Assim ele abre como um app, em tela cheia.
+    </div>
+    <div class="sec-title">Sobre o cálculo</div>
+    <div class="card note">
+      ⚠️ As datas são <b>estimativas</b> pelo método do calendário: ovulação ≈ 14 dias antes da próxima menstruação (ou a fase lútea calculada pelos períodos férteis que você registrar); janela fértil = 5 dias antes até 1 dia depois da ovulação. Ciclos variam bastante — isto <b>não</b> serve como método contraceptivo.<br><br>
+      Os dados ficam salvos <b>só neste aparelho/navegador</b>. Faça backup de vez em quando.
     </div>
   </section>
 </main>
 
-<p class="note">⚠️ As datas são <b>estimativas</b> pelo método do calendário (ovulação ≈ 14 dias antes da próxima menstruação — ou a fase lútea calculada pelos períodos férteis registrados; janela fértil = 5 dias antes até 1 dia depois da ovulação). Ciclos variam bastante — isto <b>não</b> serve como método contraceptivo. Os dados ficam salvos só neste navegador (use “Backup” para não perder).</p>
+<nav class="tabbar">
+  <button class="tab on" data-v="home"><span class="i">🏠</span>Início<span class="badge" id="badge" hidden></span></button>
+  <button class="tab" data-v="cal"><span class="i">📅</span>Calendário</button>
+  <button class="tab" data-v="girls"><span class="i">💕</span>Mulheres</button>
+  <button class="tab" data-v="more"><span class="i">⚙️</span>Mais</button>
+</nav>
 
-<dialog id="dlg">
-  <form id="form" method="dialog">
-    <h2 id="formTitle">Nova mulher</h2>
-    <label>Nome *<input name="name" required></label>
-    <div class="two">
-      <label>Idade<input name="age" type="number" min="18" max="99"></label>
-      <label>De onde é<input name="from" placeholder="Cidade / estado"></label>
-    </div>
-    <label>Do que gosta (separe por vírgula)<input name="likes" placeholder="praia, sushi, rock..."></label>
-    <label>Observações<textarea name="notes"></textarea></label>
-    <div class="two">
-      <label>Início da última menstruação<input name="last" type="date"></label>
-      <label>Duração do ciclo (dias)<input name="cycle" type="number" min="20" max="45" value="28"></label>
-    </div>
-    <label>Duração da menstruação (dias)<input name="period" type="number" min="2" max="10" value="5"></label>
-    <div class="two">
-      <label>Último período fértil – início<input name="fStart" type="date"></label>
-      <label>Último período fértil – fim<input name="fEnd" type="date"></label>
-    </div>
-    <div><small style="color:var(--muted)">Cor</small><div class="colors" id="colors"></div></div>
-    <div class="row" style="justify-content:flex-end;margin-top:6px">
-      <button type="button" id="cancel">Cancelar</button>
-      <button class="primary" type="submit">Salvar</button>
-    </div>
-  </form>
-</dialog>
-
-<dialog id="dayDlg">
-  <div style="padding:18px;display:grid;gap:8px">
-    <strong id="dayTitle" style="text-transform:capitalize"></strong>
-    <div id="dayOpts" style="display:grid;gap:8px"></div>
-    <button type="button" onclick="dayDlg.close()">Cancelar</button>
+<!-- FORMULÁRIO -->
+<dialog class="sheet" id="dlg">
+  <div class="grab"></div>
+  <div class="sheet-body">
+    <div class="sheet-top"><h2 id="formTitle">Nova mulher</h2><button class="x" type="button" data-close>✕</button></div>
+    <form id="form">
+      <label>Nome *<input name="name" required autocomplete="off"></label>
+      <div class="two">
+        <label>Idade<input name="age" type="number" inputmode="numeric" min="18" max="99"></label>
+        <label>De onde é<input name="from" placeholder="Cidade/UF" autocomplete="off"></label>
+      </div>
+      <label>Do que gosta<input name="likes" placeholder="praia, sushi, rock…" autocomplete="off"></label>
+      <label>Observações<textarea name="notes"></textarea></label>
+      <fieldset>
+        <legend>Ciclo</legend>
+        <label>Início da última menstruação<input name="last" type="date"></label>
+        <div class="two">
+          <label>Último fértil – início<input name="fStart" type="date"></label>
+          <label>Último fértil – fim<input name="fEnd" type="date"></label>
+        </div>
+        <div class="two">
+          <label>Ciclo (dias)<input name="cycle" type="number" inputmode="numeric" min="20" max="45" value="28"></label>
+          <label>Menstruação (dias)<input name="period" type="number" inputmode="numeric" min="2" max="10" value="5"></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Cor</legend>
+        <div class="colors" id="colors"></div>
+      </fieldset>
+      <button class="btn primary" type="submit" style="margin-top:6px">Salvar</button>
+    </form>
   </div>
 </dialog>
+
+<!-- PERFIL -->
+<dialog class="sheet" id="prof">
+  <div class="grab"></div>
+  <div class="sheet-body" id="profBody"></div>
+</dialog>
+
+<!-- MENU DO DIA -->
+<dialog class="sheet" id="dayDlg">
+  <div class="grab"></div>
+  <div class="sheet-body">
+    <div class="sheet-top"><h2 id="dayTitle" style="text-transform:capitalize;font-size:1.1rem"></h2><button class="x" type="button" data-close>✕</button></div>
+    <div class="opts" id="dayOpts"></div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast"></div>
 
 <script>
 const KEY = 'calendarioFertil.v1';
@@ -174,7 +302,8 @@ const COLORS = ['#e91e63','#9c27b0','#3f51b5','#03a9f4','#009688','#ff9800','#79
 const MS = 86400000;
 
 let state = load();
-let selected = null;           // id da mulher selecionada (null = todas)
+let calSel = null;      // mulher selecionada no calendário (null = todas)
+let profId = null;      // perfil aberto
 let view = startOfMonth(new Date());
 let editingId = null;
 
@@ -186,33 +315,27 @@ function add(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
 function startOfMonth(d){ return new Date(d.getFullYear(), d.getMonth(), 1); }
 function today(){ const t=new Date(); return new Date(t.getFullYear(),t.getMonth(),t.getDate()); }
 function br(d){ return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}); }
+function brl(s){ return parse(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.',''); }
 
 /* ---------- armazenamento ---------- */
 function load(){
   try{ const s=JSON.parse(localStorage.getItem(KEY)); if(s && Array.isArray(s.women)) return s; }catch(e){}
   return {women:[]};
 }
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){ alert('Não foi possível salvar neste navegador.'); } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){ toast('Não foi possível salvar neste navegador'); } }
 function byId(id){ return state.women.find(w=>w.id===id); }
 
 /* ---------- lógica do ciclo ---------- */
 function starts(w){ return [...new Set(w.periods)].sort().map(parse); }
-
-// Média do ciclo usando o histórico (se houver 2+ datas plausíveis), senão o valor informado
 function cycleLen(w){
   const s=starts(w); const gaps=[];
   for(let i=1;i<s.length;i++){ const g=diff(s[i],s[i-1]); if(g>=20 && g<=45) gaps.push(g); }
-  if(gaps.length) return Math.round(gaps.slice(-6).reduce((a,b)=>a+b,0)/Math.min(gaps.length,6));
+  if(gaps.length){ const l=gaps.slice(-6); return Math.round(l.reduce((a,b)=>a+b,0)/l.length); }
   return Number(w.cycle)||28;
 }
-
-// Períodos férteis registrados (reais), ordenados
 function fertiles(w){ return (w.fertiles||[]).map(f=>({s:parse(f.start),e:parse(f.end)})).sort((a,b)=>a.s-b.s); }
-// Ovulação estimada dentro de um período fértil registrado (penúltimo dia; ou o próprio dia se for curto)
 function ovOf(f){ return diff(f.e,f.s)+1>=3 ? add(f.e,-1) : f.e; }
 function recordedAt(w,d){ return fertiles(w).find(f=>diff(d,f.s)>=0 && diff(f.e,d)>=0); }
-
-// Fase lútea (ovulação -> próxima menstruação). Calculada a partir dos férteis registrados; padrão 14
 function luteal(w){
   const s=starts(w), vals=[];
   fertiles(w).forEach(f=>{ const ov=ovOf(f), nx=s.find(x=>diff(x,ov)>0);
@@ -220,8 +343,6 @@ function luteal(w){
   if(!vals.length) return {v:14, calc:false};
   const last=vals.slice(-6); return {v:Math.round(last.reduce((a,b)=>a+b,0)/last.length), calc:true};
 }
-
-// Inícios de ciclo: registrados + o próximo previsto a partir do último fértil registrado
 function anchors(w){
   const s=starts(w), fs=fertiles(w);
   if(fs.length){
@@ -230,120 +351,237 @@ function anchors(w){
   }
   return s;
 }
-
-// Status de um dia: 'period' | 'fertile' | 'ovul' | null
-function statusOn(w, d){
-  const rec=recordedAt(w,d);
-  if(rec) return diff(d,ovOf(rec))===0 ? 'ovul' : 'fertile';
+// Em qual ciclo um dia cai: {base, len, day}
+function cycleAt(w,d){
   const s=anchors(w); if(!s.length) return null;
   let i=-1; for(let k=0;k<s.length;k++) if(diff(d,s[k])>=0) i=k;
   if(i<0) return null;
-  const C=cycleLen(w), P=Number(w.period)||5, L=luteal(w).v;
-  let base=s[i], len;
-  if(i<s.length-1){ len=diff(s[i+1],base); }
+  const C=cycleLen(w); let base=s[i], len;
+  if(i<s.length-1) len=diff(s[i+1],base);
   else { const k=Math.floor(diff(d,base)/C); base=add(base,k*C); len=C; }
-  const day=diff(d,base);
-  if(day<P) return 'period';
-  // se esse ciclo já tem fértil registrado, ele substitui a estimativa
-  const end=add(base,len);
-  if(fertiles(w).some(f=>diff(f.e,base)>=0 && diff(end,f.s)>0)) return null;
-  const ov=len-L;
-  if(day===ov) return 'ovul';
-  if(day>=ov-5 && day<=ov+1) return 'fertile';
+  return {base,len,day:diff(d,base)};
+}
+function statusOn(w,d){
+  const rec=recordedAt(w,d);
+  if(rec) return diff(d,ovOf(rec))===0 ? 'ovul' : 'fertile';
+  const c=cycleAt(w,d); if(!c) return null;
+  if(c.day < (Number(w.period)||5)) return 'period';
+  const end=add(c.base,c.len);
+  if(fertiles(w).some(f=>diff(f.e,c.base)>=0 && diff(end,f.s)>0)) return null;
+  const ov=c.len-luteal(w).v;
+  if(c.day===ov) return 'ovul';
+  if(c.day>=ov-5 && c.day<=ov+1) return 'fertile';
   return null;
 }
 const isFert = st => st==='fertile' || st==='ovul';
+const hasData = w => w.periods.length || (w.fertiles||[]).length;
 
-// Próxima (ou atual) janela fértil a partir de hoje
 function nextWindow(w){
-  if(!w.periods.length && !(w.fertiles||[]).length) return null;
+  if(!hasData(w)) return null;
   const t=today(), C=cycleLen(w);
   for(let i=0;i<=C*2;i++){
     const d=add(t,i);
     if(isFert(statusOn(w,d))){
       let end=d; while(isFert(statusOn(w,add(end,1)))) end=add(end,1);
       let start=d; if(i===0) while(isFert(statusOn(w,add(start,-1)))) start=add(start,-1);
-      let ov=null; for(let x=start;diff(end,x)>=0;x=add(x,1)) if(statusOn(w,x)==='ovul') ov=x;
-      return {start,end,ov,inDays:i,now:i===0};
+      return {start,end,inDays:i,now:i===0};
     }
   }
   return null;
 }
-
-function statusText(w){
-  if(!w.periods.length && !(w.fertiles||[]).length) return {txt:'Sem data registrada', cls:''};
-  const n=nextWindow(w); if(!n) return {txt:'—',cls:''};
-  if(n.now) return {txt:`🔥 Fértil agora (até ${br(n.end)})`, cls:'hot'};
-  if(n.inDays<=3) return {txt:`⏳ Fértil em ${n.inDays} dia${n.inDays>1?'s':''} (${br(n.start)}–${br(n.end)})`, cls:'soon'};
-  return {txt:`Próxima janela: ${br(n.start)}–${br(n.end)} (em ${n.inDays} dias)`, cls:''};
+function nextPeriod(w){
+  const c=cycleAt(w,today()); if(!c) return null;
+  return add(c.base,c.len);
+}
+function statusOf(w){
+  if(!hasData(w)) return {txt:'Sem datas ainda — toque para registrar', short:'Sem datas', cls:'', rank:999};
+  const n=nextWindow(w); if(!n) return {txt:'—',short:'—',cls:'',rank:998};
+  if(n.now) return {txt:`Fértil agora · até ${br(n.end)}`, short:'🔥 Fértil agora', cls:'hot', rank:-1, n};
+  if(n.inDays<=3) return {txt:`Fértil em ${n.inDays} dia${n.inDays>1?'s':''} · ${br(n.start)}–${br(n.end)}`, short:`⏳ Em ${n.inDays}d`, cls:'soon', rank:n.inDays, n};
+  return {txt:`Próximo fértil: ${br(n.start)}–${br(n.end)} (em ${n.inDays} dias)`, short:`em ${n.inDays}d`, cls:'', rank:n.inDays, n};
 }
 
-/* ---------- render ---------- */
+/* ---------- utilidades de UI ---------- */
 function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function initial(n){ return esc((n||'?').trim().charAt(0).toUpperCase()); }
+let tt; function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('on'),2200); }
+function vibrate(){ try{ navigator.vibrate && navigator.vibrate(12); }catch(e){} }
+const statusColor = cls => cls==='hot'?'var(--hot)':cls==='soon'?'var(--warn)':'var(--muted)';
 
-function renderAlerts(){
-  const box=document.getElementById('alerts'); box.innerHTML='';
-  state.women.forEach(w=>{
-    const s=statusText(w);
-    if(s.cls) box.insertAdjacentHTML('beforeend',`<div class="alert ${s.cls}"><span class="dot" style="background:${w.color}"></span><span><b>${esc(w.name)}</b> — ${s.txt}</span></div>`);
+// barra do ciclo: menstruação, fértil e "hoje"
+function cycleBar(w){
+  const c=cycleAt(w,today()); if(!c) return '';
+  const P=Number(w.period)||5, pct=x=>Math.max(0,Math.min(100,x/c.len*100));
+  let fs=null, fe=null;
+  for(let i=0;i<c.len;i++){ const st=statusOn(w,add(c.base,i)); if(isFert(st)){ if(fs===null) fs=i; fe=i; } }
+  return `<div class="bar">
+    <i style="left:0;width:${pct(P)}%;background:var(--period)"></i>
+    ${fs!==null?`<i style="left:${pct(fs)}%;width:${pct(fe-fs+1)}%;background:var(--fertile)"></i>`:''}
+    <i style="left:calc(${pct(c.day+.5)}% - 2px);width:4px;background:var(--text)"></i>
+  </div><div class="muted" style="margin-top:6px;font-size:.78rem">Dia ${c.day+1} de ${c.len} do ciclo</div>`;
+}
+
+function girlCard(w){
+  const s=statusOf(w);
+  return `<div class="card gcard" data-prof="${w.id}">
+    <div class="avatar" style="background:${w.color}">${initial(w.name)}</div>
+    <div class="info">
+      <div class="name">${esc(w.name)}${w.age?`<span style="font-weight:400;color:var(--muted)">, ${esc(w.age)}</span>`:''}</div>
+      ${w.from?`<div class="sub">📍 ${esc(w.from)}</div>`:''}
+      <div class="st" style="color:${statusColor(s.cls)}">${s.txt}</div>
+      ${cycleBar(w)}
+    </div>
+    <span class="chev">›</span>
+  </div>`;
+}
+function bindProf(root){ root.querySelectorAll('[data-prof]').forEach(c=>c.onclick=()=>openProfile(c.dataset.prof)); }
+
+/* ---------- render: início ---------- */
+function renderHome(){
+  const el=document.getElementById('v-home');
+  if(!state.women.length){
+    el.innerHTML=`<div class="empty"><div class="big">🌸</div><b>Nenhuma cadastrada ainda</b><p>Adicione alguém para ver o calendário e os avisos de período fértil.</p>
+      <button class="btn primary" onclick="openForm(null)">+ Adicionar mulher</button></div>`;
+    return;
+  }
+  const list=state.women.map(w=>({w,s:statusOf(w)})).sort((a,b)=>a.s.rank-b.s.rank);
+  const hot=list.filter(x=>x.s.cls);
+  let html='';
+  hot.forEach(({w,s})=>{
+    html+=`<div class="hero ${s.cls}" data-prof="${w.id}">
+      <div class="avatar" style="background:${w.color}">${initial(w.name)}</div>
+      <div><div class="t">${s.cls==='hot'?'🔥':'⏳'} ${esc(w.name)}</div><div class="s">${s.txt}</div></div></div>`;
   });
+  if(!hot.length) html+=`<div class="card" style="text-align:center;color:var(--muted)">😌 Ninguém no período fértil nos próximos 3 dias</div>`;
+  html+=`<div class="sec-title">Próximos períodos férteis</div>`;
+  html+=list.map(x=>girlCard(x.w)).join('');
+  el.innerHTML=html; bindProf(el);
+  const b=document.getElementById('badge'); b.hidden=!hot.length; b.textContent=hot.length;
 }
 
-function renderList(){
-  const el=document.getElementById('list');
-  if(!state.women.length){ el.innerHTML='<div class="empty">Nenhuma cadastrada ainda.<br>Clique em <b>+ Adicionar mulher</b>.</div>'; return; }
-  el.innerHTML=state.women.map(w=>{
-    const s=statusText(w);
-    const color = s.cls==='hot'?'var(--hot)':s.cls==='soon'?'var(--warn)':'var(--muted)';
-    return `<div class="girl ${selected===w.id?'sel':''}" data-id="${w.id}">
-      <h3><span class="dot" style="background:${w.color}"></span>${esc(w.name)}${w.age?`<small style="color:var(--muted);font-weight:400">, ${esc(w.age)}</small>`:''}</h3>
-      ${w.from?`<div class="meta">📍 ${esc(w.from)}</div>`:''}
-      <div class="status" style="color:${color}">${s.txt}</div>
-    </div>`;
-  }).join('');
-  el.querySelectorAll('.girl').forEach(d=>d.onclick=()=>{ selected = selected===d.dataset.id?null:d.dataset.id; render(); });
+/* ---------- render: mulheres ---------- */
+function renderGirls(){
+  const el=document.getElementById('v-girls');
+  if(!state.women.length){ el.innerHTML=`<div class="empty"><div class="big">💕</div><p>Nenhuma cadastrada.</p><button class="btn primary" onclick="openForm(null)">+ Adicionar mulher</button></div>`; return; }
+  el.innerHTML=`<div class="sec-title">${state.women.length} cadastrada${state.women.length>1?'s':''}</div>`+
+    [...state.women].sort((a,b)=>a.name.localeCompare(b.name)).map(girlCard).join('')+
+    `<button class="btn" onclick="openForm(null)" style="margin-top:6px">+ Adicionar mulher</button>`;
+  bindProf(el);
 }
 
-function renderDetails(){
-  const el=document.getElementById('details'); const w=byId(selected);
-  if(!w){ el.innerHTML=''; return; }
-  const likes=(w.likes||'').split(',').map(s=>s.trim()).filter(Boolean);
-  const hist=[...new Set(w.periods)].sort().reverse();
+/* ---------- render: calendário ---------- */
+function renderCalendar(){
+  if(calSel && !byId(calSel)) calSel=null;
+  const chips=document.getElementById('chips');
+  chips.innerHTML=`<button class="chip ${!calSel?'on':''}" data-c="">Todas</button>`+
+    state.women.map(w=>`<button class="chip ${calSel===w.id?'on':''}" data-c="${w.id}"><span class="dot" style="background:${w.color}"></span>${esc(w.name)}</button>`).join('');
+  chips.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{ calSel=c.dataset.c||null; renderCalendar(); });
+
+  document.getElementById('monthTitle').textContent=view.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const w=byId(calSel);
+  document.getElementById('calHint').textContent = !state.women.length ? '' : w
+    ? 'Toque num dia para registrar menstruação ou dia fértil · deslize para trocar o mês'
+    : 'Escolha uma acima para registrar datas · deslize para trocar o mês';
+  let html=['D','S','T','Q','Q','S','S'].map(d=>`<div class="wd">${d}</div>`).join('');
+  const first=add(view,-view.getDay()), t=today();
+  for(let i=0;i<42;i++){
+    const d=add(first,i), out=d.getMonth()!==view.getMonth();
+    let cls='day'+(out?' out':'')+(diff(d,t)===0?' today':''), inner=`${d.getDate()}`;
+    if(w){
+      const st=statusOn(w,d); if(st) cls+=' '+st;
+      if(recordedAt(w,d)) cls+=' rec';
+      if(w.periods.includes(iso(d))) inner+='<span class="ic">🩸</span>';
+      else if(st==='ovul') inner+='<span class="ic">🥚</span>';
+    } else {
+      const dots=state.women.map(x=>{ const st=statusOn(x,d); if(!st) return '';
+        return `<span class="dot ${st==='period'?'p':st==='ovul'?'o':''}" style="background:${x.color}"></span>`; }).join('');
+      if(dots) inner+=`<div class="dots">${dots}</div>`;
+    }
+    html+=`<button class="${cls}" data-d="${iso(d)}">${inner}</button>`;
+  }
+  const g=document.getElementById('grid'); g.innerHTML=html;
+  g.querySelectorAll('.day').forEach(c=>c.onclick=()=>onDay(c.dataset.d));
+}
+function onDay(v){
+  const w=byId(calSel);
+  if(w) return openDayMenu(w,v);
+  // modo "todas": mostra quem está fértil/menstruada nesse dia
+  const d=parse(v);
+  const who=state.women.map(x=>({x,st:statusOn(x,d)})).filter(o=>o.st);
+  document.getElementById('dayTitle').textContent=d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+  const box=document.getElementById('dayOpts');
+  box.innerHTML = who.length ? who.map(o=>`<button class="opt" data-w="${o.x.id}"><span class="dot" style="background:${o.x.color};width:14px;height:14px"></span>${esc(o.x.name)}
+      <span class="muted" style="margin-left:auto">${o.st==='period'?'🩸 menstruação':o.st==='ovul'?'🥚 ovulação':'🌿 fértil'}</span></button>`).join('')
+    : `<div class="muted" style="text-align:center;padding:10px">Nada previsto nesse dia.</div>`;
+  box.insertAdjacentHTML('beforeend','<div class="muted" style="text-align:center">Toque numa pessoa para registrar datas dela</div>');
+  box.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{ calSel=b.dataset.w; dayDlg.close(); renderCalendar(); openDayMenu(byId(calSel),v); });
+  dayDlg.showModal();
+}
+
+/* ---------- perfil ---------- */
+const prof=document.getElementById('prof');
+function openProfile(id){ profId=id; renderProfile(); if(!prof.open) prof.showModal(); }
+function renderProfile(){
+  const w=byId(profId); if(!w){ if(prof.open) prof.close(); return; }
   w.fertiles=w.fertiles||[];
+  const s=statusOf(w), lut=luteal(w), np=hasData(w)?nextPeriod(w):null;
+  const likes=(w.likes||'').split(',').map(x=>x.trim()).filter(Boolean);
+  const hist=[...new Set(w.periods)].sort().reverse();
   const fhist=[...w.fertiles].sort((a,b)=>b.start.localeCompare(a.start));
-  const lut=luteal(w);
-  el.innerHTML=`<hr style="border:none;border-top:1px solid var(--line);margin:14px 0">
-    <div class="row" style="justify-content:space-between"><strong>Detalhes de ${esc(w.name)}</strong>
-      <span class="row"><button class="small" id="dEdit">Editar</button><button class="small danger" id="dDel">Excluir</button></span></div>
-    <dl class="details">
-      <dt>Idade</dt><dd>${esc(w.age)||'—'}</dd>
-      <dt>De onde é</dt><dd>${esc(w.from)||'—'}</dd>
-      <dt>Do que gosta</dt><dd>${likes.length?`<div class="tags">${likes.map(l=>`<span class="tag">${esc(l)}</span>`).join('')}</div>`:'—'}</dd>
-      ${w.notes?`<dt>Observações</dt><dd>${esc(w.notes)}</dd>`:''}
-      <dt>Ciclo médio</dt><dd>${cycleLen(w)} dias · menstruação ${w.period||5} dias</dd>
-      <dt>Fase lútea (ovulação → menstruação)</dt><dd>${lut.v} dias ${lut.calc?'<small style="color:var(--hot)">· calculada pelos férteis registrados</small>':'<small style="color:var(--muted)">· padrão (registre férteis + menstruação seguinte para ajustar)</small>'}</dd>
-      <dt>Inícios de menstruação registrados</dt>
-      <dd><div class="hist">${hist.length?hist.map(h=>`<span>${parse(h).toLocaleDateString('pt-BR')}<b data-h="${h}" title="Remover">×</b></span>`).join(''):'Nenhum'}</div>
-        <div class="row" style="margin-top:8px"><input type="date" id="newDate" style="width:auto"><button class="small primary" id="addDate">Registrar</button></div></dd>
-      <dt>Períodos férteis registrados</dt>
-      <dd><div class="hist">${fhist.length?fhist.map((f,i)=>`<span>${parse(f.start).toLocaleDateString('pt-BR')}${f.end!==f.start?' – '+parse(f.end).toLocaleDateString('pt-BR'):''}<b data-f="${i}" title="Remover">×</b></span>`).join(''):'Nenhum'}</div>
-        <div class="row" style="margin-top:8px"><input type="date" id="fStart" style="width:auto" title="Início"><span>até</span><input type="date" id="fEnd" style="width:auto" title="Fim"><button class="small primary" id="addFert">Registrar</button></div></dd>
-    </dl>`;
-  document.getElementById('addFert').onclick=()=>{
-    const a=document.getElementById('fStart').value, b=document.getElementById('fEnd').value||a;
-    if(!a) return alert('Informe ao menos a data de início.');
-    addFertile(w, a<=b?a:b, a<=b?b:a);
-  };
-  el.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{ const f=fhist[b.dataset.f]; w.fertiles=w.fertiles.filter(x=>x!==f); save(); render(); });
-  document.getElementById('dEdit').onclick=()=>openForm(w);
-  document.getElementById('dDel').onclick=()=>{ if(confirm(`Excluir ${w.name}?`)){ state.women=state.women.filter(x=>x.id!==w.id); selected=null; save(); render(); } };
-  document.getElementById('addDate').onclick=()=>{ const v=document.getElementById('newDate').value; if(v){ addPeriod(w,v); } };
-  el.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{ w.periods=w.periods.filter(p=>p!==b.dataset.h); save(); render(); });
+  const tIso=iso(today());
+  const fertToday=!!recordedAt(w,today());
+  document.getElementById('profBody').innerHTML=`
+    <div class="sheet-top"><span></span><button class="x" type="button" data-close>✕</button></div>
+    <div class="prof-head">
+      <div class="avatar" style="background:${w.color}">${initial(w.name)}</div>
+      <div><h2>${esc(w.name)}</h2>
+        <div class="muted">${[w.age?esc(w.age)+' anos':'', w.from?'📍 '+esc(w.from):''].filter(Boolean).join(' · ')||'&nbsp;'}</div></div>
+    </div>
+    <div class="hero ${s.cls}" style="box-shadow:none;${s.cls?'':'background:var(--bg)'}">
+      <div style="flex:1"><div class="t" style="color:${statusColor(s.cls)}">${s.txt}</div>${cycleBar(w)}</div>
+    </div>
+    <div class="btns">
+      <button class="btn" id="pPer">🩸 Menstruou hoje</button>
+      <button class="btn" id="pFert">${fertToday?'✓ Fértil hoje':'🌿 Fértil hoje'}</button>
+    </div>
+    ${likes.length?`<div class="sec-title">Gosta de</div><div class="tags">${likes.map(l=>`<span class="tag">${esc(l)}</span>`).join('')}</div>`:''}
+    ${w.notes?`<div class="sec-title">Observações</div><div style="white-space:pre-wrap">${esc(w.notes)}</div>`:''}
+    <div class="sec-title">Ciclo</div>
+    <dl class="kv">
+      <dt>Duração do ciclo</dt><dd>${cycleLen(w)} dias</dd>
+      <dt>Menstruação</dt><dd>${w.period||5} dias</dd>
+      <dt>Fase lútea</dt><dd>${lut.v} dias <span class="muted" style="font-weight:400">${lut.calc?'(calculada)':'(padrão)'}</span></dd>
+      ${np?`<dt>Próxima menstruação</dt><dd>${br(np)}</dd>`:''}
+    </dl>
+    <div class="sec-title">🩸 Menstruações registradas</div>
+    <div class="hist">${hist.length?hist.map(h=>`<span>${brl(h)}<button data-h="${h}" aria-label="Remover">×</button></span>`).join(''):'<span class="muted" style="background:none;padding:0">Nenhuma</span>'}</div>
+    <div class="add-row"><input type="date" id="newDate" max="${tIso}"><button class="btn primary" id="addDate">Adicionar</button></div>
+    <div class="sec-title">🌿 Períodos férteis registrados</div>
+    <div class="hist">${fhist.length?fhist.map((f,i)=>`<span>${brl(f.start)}${f.end!==f.start?' – '+brl(f.end):''}<button data-f="${i}" aria-label="Remover">×</button></span>`).join(''):'<span class="muted" style="background:none;padding:0">Nenhum</span>'}</div>
+    <div class="two"><input type="date" id="fStart" aria-label="Início"><input type="date" id="fEnd" aria-label="Fim"></div>
+    <button class="btn primary" id="addFert" style="margin-top:8px">Adicionar período fértil</button>
+    <div class="sec-title"></div>
+    <div class="btns">
+      <button class="btn ghost" id="pCal">📅 Calendário</button>
+      <button class="btn ghost" id="pEdit">✏️ Editar</button>
+    </div>
+    <button class="btn danger" id="pDel" style="margin-top:6px">Excluir ${esc(w.name)}</button>`;
+  const $=id=>document.getElementById(id);
+  $('pPer').onclick=()=>{ addPeriod(w,tIso); vibrate(); toast('🩸 Menstruação registrada hoje'); };
+  $('pFert').onclick=()=>{ if(fertToday){ removeFertileDay(w,tIso); toast('Removido'); } else { addFertile(w,tIso,tIso); toast('🌿 Dia fértil registrado'); } vibrate(); };
+  $('addDate').onclick=()=>{ const v=$('newDate').value; if(!v) return toast('Escolha uma data'); addPeriod(w,v); toast('🩸 Registrado'); };
+  $('addFert').onclick=()=>{ const a=$('fStart').value, b=$('fEnd').value||a; if(!a) return toast('Escolha a data de início');
+    addFertile(w, a<=b?a:b, a<=b?b:a); toast('🌿 Período fértil registrado'); };
+  $('pCal').onclick=()=>{ calSel=w.id; prof.close(); go('cal'); };
+  $('pEdit').onclick=()=>{ prof.close(); openForm(w); };
+  $('pDel').onclick=()=>{ if(confirm(`Excluir ${w.name}? Isso apaga todos os dados dela.`)){ state.women=state.women.filter(x=>x.id!==w.id); save(); prof.close(); render(); toast('Excluída'); } };
+  document.querySelectorAll('#profBody [data-h]').forEach(b=>b.onclick=()=>{ w.periods=w.periods.filter(p=>p!==b.dataset.h); save(); render(); });
+  document.querySelectorAll('#profBody [data-f]').forEach(b=>b.onclick=()=>{ const f=fhist[b.dataset.f]; w.fertiles=w.fertiles.filter(x=>x!==f); save(); render(); });
+  bindClose(prof);
 }
 
+/* ---------- registros ---------- */
 function addPeriod(w,v){ if(!w.periods.includes(v)) w.periods.push(v); save(); render(); }
-
-// Adiciona um período fértil, juntando com outros que se encostem/sobreponham
 function addFertile(w,a,b){
   w.fertiles=w.fertiles||[];
   let s=parse(a), e=parse(b);
@@ -365,62 +603,27 @@ function removeFertileDay(w,v){
   w.fertiles=out; save(); render();
 }
 
-function renderCalendar(){
-  document.getElementById('monthTitle').textContent=view.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
-  const w=byId(selected);
-  document.getElementById('calHint').textContent = w
-    ? `Mostrando ${w.name}. Clique num dia para registrar menstruação ou dia fértil.`
-    : 'Mostrando todas. Selecione uma para ver detalhes.';
-  const g=document.getElementById('grid');
-  let html=['D','S','T','Q','Q','S','S'].map(d=>`<div class="wd">${d}</div>`).join('');
-  const first=add(view,-view.getDay()), t=today();
-  for(let i=0;i<42;i++){
-    const d=add(first,i), out=d.getMonth()!==view.getMonth(), isToday=diff(d,t)===0;
-    let cls='day'+(out?' out':'')+(isToday?' today':''), inner=`<div class="n">${d.getDate()}</div>`;
-    if(w){
-      const st=statusOn(w,d);
-      if(st) cls+=' '+st;
-      if(recordedAt(w,d)) cls+=' rec';
-      if(w.periods.includes(iso(d))) inner+='<div class="lbl">🩸 início</div>';
-      else if(st==='ovul') inner+='<div class="lbl">ovulação</div>';
-      else if(recordedAt(w,d)) inner+='<div class="lbl">✓ fértil</div>';
-    } else {
-      const dots=state.women.map(x=>{ const st=statusOn(x,d); if(!st) return '';
-        const c=st==='period'?'p':st==='ovul'?'o':''; return `<span class="dot ${c}" title="${esc(x.name)}: ${st==='period'?'menstruação':st==='ovul'?'ovulação':'fértil'}" style="background:${x.color}"></span>`; }).join('');
-      if(dots) inner+=`<div class="dots">${dots}</div>`;
-    }
-    html+=`<div class="${cls}" data-d="${iso(d)}">${inner}</div>`;
-  }
-  g.innerHTML=html;
-  g.querySelectorAll('.day').forEach(c=>c.onclick=()=>{
-    const w=byId(selected); const v=c.dataset.d;
-    if(!w){ if(state.women.length) alert('Selecione uma mulher na lista para registrar datas.'); return; }
-    openDayMenu(w,v);
-  });
-}
-
-/* ---------- menu ao clicar num dia ---------- */
+/* ---------- menu do dia ---------- */
 const dayDlg=document.getElementById('dayDlg');
 function openDayMenu(w,v){
   const isP=w.periods.includes(v), isF=!!recordedAt(w,parse(v));
-  document.getElementById('dayTitle').textContent=`${parse(v).toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})} · ${w.name}`;
+  document.getElementById('dayTitle').textContent=`${parse(v).toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'long'})} · ${w.name}`;
   const opts=[
-    isP ? ['🩸 Remover início da menstruação',()=>{ w.periods=w.periods.filter(p=>p!==v); save(); render(); }]
-        : ['🩸 Início da menstruação',()=>addPeriod(w,v)],
-    isF ? ['🌿 Remover este dia do período fértil',()=>removeFertileDay(w,v)]
-        : ['🌿 Marcar como dia fértil',()=>addFertile(w,v,v)],
+    isP ? ['🩸','Remover início da menstruação',()=>{ w.periods=w.periods.filter(p=>p!==v); save(); render(); toast('Removido'); }]
+        : ['🩸','Início da menstruação',()=>{ addPeriod(w,v); toast('🩸 Registrado'); }],
+    isF ? ['🌿','Remover dia fértil',()=>{ removeFertileDay(w,v); toast('Removido'); }]
+        : ['🌿','Marcar como dia fértil',()=>{ addFertile(w,v,v); toast('🌿 Registrado'); }],
+    ['👤','Ver perfil de '+w.name,()=>openProfile(w.id)],
   ];
   const box=document.getElementById('dayOpts'); box.innerHTML='';
-  opts.forEach(([t,fn])=>{ const b=document.createElement('button'); b.type='button'; b.textContent=t; b.onclick=()=>{ dayDlg.close(); fn(); }; box.appendChild(b); });
+  opts.forEach(([e,t,fn])=>{ const b=document.createElement('button'); b.className='opt'; b.innerHTML=`<span class="e">${e}</span>${esc(t)}`;
+    b.onclick=()=>{ dayDlg.close(); vibrate(); fn(); }; box.appendChild(b); });
   dayDlg.showModal();
 }
-
-function render(){ renderAlerts(); renderList(); renderDetails(); renderCalendar(); }
 
 /* ---------- formulário ---------- */
 const dlg=document.getElementById('dlg'), form=document.getElementById('form');
 document.getElementById('colors').innerHTML=COLORS.map((c,i)=>`<input type="radio" name="color" id="c${i}" value="${c}"><label for="c${i}" style="background:${c}"></label>`).join('');
-
 function openForm(w){
   editingId=w?w.id:null; form.reset();
   document.getElementById('formTitle').textContent=w?`Editar ${w.name}`:'Nova mulher';
@@ -428,56 +631,87 @@ function openForm(w){
   const color=w?w.color:(COLORS.find(c=>!used.includes(c))||COLORS[state.women.length%COLORS.length]);
   if(w){ ['name','age','from','likes','notes','cycle','period'].forEach(k=>form[k].value=w[k]??''); form.last.value=[...w.periods].sort().pop()||'';
     const lf=[...(w.fertiles||[])].sort((a,b)=>a.start.localeCompare(b.start)).pop(); if(lf){ form.fStart.value=lf.start; form.fEnd.value=lf.end; } }
-  form.querySelector(`input[value="${color}"]`).checked=true;
-  dlg.showModal();
+  (form.querySelector(`input[value="${color}"]`)||form.querySelector('input[name=color]')).checked=true;
+  dlg.showModal(); dlg.scrollTop=0;
 }
 document.getElementById('btnAdd').onclick=()=>openForm(null);
-document.getElementById('cancel').onclick=()=>dlg.close();
 form.onsubmit=e=>{
   e.preventDefault();
   const f=Object.fromEntries(new FormData(form));
   const data={name:f.name.trim(),age:f.age,from:f.from.trim(),likes:f.likes,notes:f.notes.trim(),cycle:Number(f.cycle)||28,period:Number(f.period)||5,color:f.color};
   let w;
   if(editingId){ w=byId(editingId); Object.assign(w,data); if(f.last && !w.periods.includes(f.last)) w.periods.push(f.last); }
-  else { const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6); w={id,...data,periods:f.last?[f.last]:[],fertiles:[]}; state.women.push(w); selected=id; }
+  else { const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6); w={id,...data,periods:f.last?[f.last]:[],fertiles:[]}; state.women.push(w); }
   if(f.fStart){ const b=f.fEnd||f.fStart; addFertile(w, f.fStart<=b?f.fStart:b, f.fStart<=b?b:f.fStart); }
-  save(); dlg.close(); render();
+  save(); dlg.close(); render(); toast(editingId?'✓ Alterações salvas':`✓ ${w.name} adicionada`);
+  if(!editingId) openProfile(w.id);
 };
 
-/* ---------- navegação ---------- */
-document.getElementById('prev').onclick=()=>{ view=new Date(view.getFullYear(),view.getMonth()-1,1); renderCalendar(); };
-document.getElementById('next').onclick=()=>{ view=new Date(view.getFullYear(),view.getMonth()+1,1); renderCalendar(); };
-document.getElementById('btnToday').onclick=()=>{ view=startOfMonth(new Date()); renderCalendar(); };
-document.getElementById('btnAll').onclick=()=>{ selected=null; render(); };
+/* ---------- sheets: fechar ---------- */
+function bindClose(d){ d.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>d.close()); }
+[dlg,prof,dayDlg].forEach(d=>{
+  bindClose(d);
+  d.addEventListener('click',e=>{ if(e.target===d) d.close(); }); // toque fora fecha
+  // arrastar para baixo pelo topo fecha
+  let y0=null;
+  d.addEventListener('touchstart',e=>{ y0 = d.scrollTop<=0 ? e.touches[0].clientY : null; },{passive:true});
+  d.addEventListener('touchend',e=>{ if(y0!==null && e.changedTouches[0].clientY-y0>110 && d.scrollTop<=0) d.close(); y0=null; });
+});
+
+/* ---------- navegação por abas ---------- */
+function go(v){
+  document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===v));
+  try{ localStorage.setItem(KEY+'.tab',v); }catch(e){}
+  if(v==='cal') renderCalendar();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>go(t.dataset.v));
+
+/* ---------- calendário: navegação ---------- */
+function shift(n){ view=new Date(view.getFullYear(),view.getMonth()+n,1); renderCalendar(); }
+document.getElementById('prev').onclick=()=>shift(-1);
+document.getElementById('next').onclick=()=>shift(1);
+document.getElementById('monthTitle').onclick=()=>{ view=startOfMonth(new Date()); renderCalendar(); };
+(()=>{ const g=document.getElementById('grid'); let x0=null,y0=null;
+  g.addEventListener('touchstart',e=>{ x0=e.touches[0].clientX; y0=e.touches[0].clientY; },{passive:true});
+  g.addEventListener('touchend',e=>{ if(x0===null) return; const dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0;
+    if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)*1.5) shift(dx<0?1:-1); x0=null; });
+})();
 
 /* ---------- backup ---------- */
 document.getElementById('btnExport').onclick=()=>{
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));
-  a.download=`calendario-fertil-${iso(today())}.json`; a.click();
+  a.download=`calendario-fertil-${iso(today())}.json`; a.click(); toast('Backup baixado');
 };
 document.getElementById('btnImport').onclick=()=>document.getElementById('fileImport').click();
 document.getElementById('fileImport').onchange=e=>{
   const file=e.target.files[0]; if(!file) return;
   file.text().then(t=>{ const s=JSON.parse(t); if(!Array.isArray(s.women)) throw 0;
-    if(confirm('Substituir os dados atuais pelo backup?')){ state=s; selected=null; save(); render(); } })
-    .catch(()=>alert('Arquivo inválido.'));
+    if(confirm('Substituir os dados atuais pelo backup?')){ state=s; save(); render(); toast('✓ Backup restaurado'); } })
+    .catch(()=>toast('Arquivo inválido'));
   e.target.value='';
 };
 
-/* ---------- notificações do navegador ---------- */
+/* ---------- notificações ---------- */
 function notify(){
   if(!('Notification' in window) || Notification.permission!=='granted') return;
-  const msgs=state.women.map(w=>({w,s:statusText(w)})).filter(x=>x.s.cls).map(x=>`${x.w.name}: ${x.s.txt.replace(/^\S+\s/,'')}`);
-  if(msgs.length) new Notification('Calendário Fértil', {body:msgs.join('\n')});
+  const msgs=state.women.map(w=>({w,s:statusOf(w)})).filter(x=>x.s.cls).map(x=>`${x.w.name}: ${x.s.txt}`);
+  if(msgs.length) try{ new Notification('Calendário Fértil',{body:msgs.join('\n')}); }catch(e){}
 }
 document.getElementById('btnNotif').onclick=()=>{
-  if(!('Notification' in window)) return alert('Seu navegador não suporta notificações.');
-  Notification.requestPermission().then(p=>{ if(p==='granted'){ notify(); } else alert('Permissão negada.'); });
+  if(!('Notification' in window)) return toast('Este navegador não suporta notificações');
+  Notification.requestPermission().then(p=>{ if(p==='granted'){ toast('🔔 Notificações ativadas'); notify(); } else toast('Permissão negada'); });
 };
 
+/* ---------- inicialização ---------- */
+function render(){ renderHome(); renderGirls(); renderCalendar(); if(prof.open) renderProfile(); }
 render();
+try{ const t=localStorage.getItem(KEY+'.tab'); if(t && document.getElementById('v-'+t)) go(t); }catch(e){}
 notify();
+// atualiza quando o app volta para a tela (muda o "hoje")
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) render(); });
 </script>
 </body>
 </html>
